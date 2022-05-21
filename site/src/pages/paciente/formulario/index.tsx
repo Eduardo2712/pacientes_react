@@ -5,6 +5,7 @@ import { Button, Container, Grid, TextField, Typography } from "@mui/material";
 import { Pacientes } from "../../../interfaces";
 import ModalConfirmacao from "../../../components/modalConfirmacao";
 import { Link } from "react-router-dom";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 
 interface Props {
     id?: number;
@@ -240,20 +241,20 @@ const Formulario = (props: Props) => {
                         alignItems="center"
                     >
                         <Grid ml={6}>
-                            <Link
-                                style={{
-                                    fontWeight: 500,
-                                    fontSize: "0.875rem",
-                                    textTransform: "uppercase",
-                                }}
-                                to={"/"}
-                            >
-                                Voltar
+                            <Link to={"/"}>
+                                <KeyboardReturnIcon
+                                    sx={{ width: 150, height: 40 }}
+                                    style={{
+                                        backgroundColor: "#1565c0",
+                                        color: "#fff",
+                                        borderRadius: "4px",
+                                    }}
+                                ></KeyboardReturnIcon>
                             </Link>
                         </Grid>
                         <Grid mr={6}>
                             <Button
-                                sx={{ width: 150 }}
+                                sx={{ width: 150, height: 40 }}
                                 type="submit"
                                 variant="contained"
                             >
@@ -263,7 +264,10 @@ const Formulario = (props: Props) => {
                     </Grid>
                 </Grid>
             </form>
-            <ModalConfirmacao ativo={modalAtivo}></ModalConfirmacao>
+            <ModalConfirmacao
+                ativo={modalAtivo}
+                mensagem={"Dados salvos com sucesso"}
+            ></ModalConfirmacao>
         </>
     );
 };
