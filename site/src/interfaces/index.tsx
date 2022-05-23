@@ -1,4 +1,4 @@
-export interface Pacientes {
+export interface Items {
     id: number;
     nome: string;
     data_nasc: string;

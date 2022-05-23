@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Button, Container, Grid, TextField, Typography } from "@mui/material";
-import { Pacientes } from "../../../interfaces";
+import { Button, Grid, TextField, Typography } from "@mui/material";
 import ModalConfirmacao from "../../../components/modalConfirmacao";
 import { Link } from "react-router-dom";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
+import { Items } from "../../../interfaces";
 
 interface Props {
     id?: number;
@@ -13,7 +13,7 @@ interface Props {
 
 const Formulario = (props: Props) => {
     const [modalAtivo, setModalAtivo] = useState<boolean>(false);
-    const [paciente, setPaciente] = useState<Pacientes>();
+    const [paciente, setPaciente] = useState<Items>();
 
     useEffect(() => {}, []);
 

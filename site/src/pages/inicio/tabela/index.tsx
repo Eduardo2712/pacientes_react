@@ -1,24 +1,31 @@
-import {
-    DataGrid,
-    GridColDef,
-    GridRenderCellParams,
-    GridRowsProp,
-    ptBR,
-} from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRowsProp, ptBR } from "@mui/x-data-grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Box, Button, Grid } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalConfirmacao from "../../../components/modalConfirmacao";
 import { Link } from "react-router-dom";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import axios from "axios";
 
 const TabelaPacientes = () => {
     const tema = createTheme({}, ptBR);
     const [modalAtivo, setModalAtivo] = useState<boolean>(false);
+    const [linhas, setLinhas] = useState<GridRowsProp>([]);
 
-    const columns: GridColDef[] = [
+    useEffect(() => {
+        axios
+            .get(`${process.env.REACT_APP_URL_API}/pacientes`)
+            .then((resposta) => {
+                setLinhas(resposta.data.Items);
+            })
+            .catch((erro) => {
+                console.error(`Erro ${erro}`);
+            });
+    }, []);
+
+    const colunas: GridColDef[] = [
         {
             field: "Ação",
             width: 200,
@@ -117,27 +124,14 @@ const TabelaPacientes = () => {
         },
     ];
 
-    const rows: GridRowsProp = [
-        {
-            id: 1,
-            nome: "João",
-            data_nasc: "01/01/2000",
-            email: "",
-            endereco: "",
-            numero: "",
-            bairro: "",
-            cidade: "",
-        },
-    ];
-
     return (
         <>
             <Grid sx={{ mt: 4 }}>
                 <ThemeProvider theme={tema}>
                     <DataGrid
                         style={{ height: 300 }}
-                        rows={rows}
-                        columns={columns}
+                        rows={linhas}
+                        columns={colunas}
                         pageSize={5}
                         rowsPerPageOptions={[5]}
                         disableSelectionOnClick
