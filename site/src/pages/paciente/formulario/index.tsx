@@ -6,6 +6,7 @@ import ModalConfirmacao from "../../../components/modalConfirmacao";
 import { Link } from "react-router-dom";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import { Items } from "../../../interfaces";
+import axios from "axios";
 
 interface Props {
     id?: number;
@@ -13,9 +14,8 @@ interface Props {
 
 const Formulario = (props: Props) => {
     const [modalAtivo, setModalAtivo] = useState<boolean>(false);
+    const [mensagemModal, setMensagemModal] = useState<string>("");
     const [paciente, setPaciente] = useState<Items>();
-
-    useEffect(() => {}, []);
 
     const esquema = Yup.object().shape({
         nome: Yup.string().required("Preencha esse campo!"),
@@ -37,6 +37,7 @@ const Formulario = (props: Props) => {
             numero: paciente?.numero ? paciente.numero : "",
             bairro: paciente?.bairro ? paciente.bairro : "",
             cidade: paciente?.cidade ? paciente.cidade : "",
+            id: props.id ? props.id : 0,
         },
         validationSchema: esquema,
         onSubmit: (values, { resetForm }) => {
@@ -47,7 +48,20 @@ const Formulario = (props: Props) => {
             values.numero = values.numero;
             values.bairro = values.bairro.toUpperCase();
             values.cidade = values.cidade.toUpperCase();
-            // Manda os dados para o backend
+            values.id = props.id ? props.id : 0;
+
+            axios
+                .put(`${process.env.REACT_APP_URL_API}/pacientes`, values)
+                .then((resposta) => {
+                    setMensagemModal("Paciente atualizado com sucesso!");
+                    setModalAtivo(true);
+                    resetForm();
+                })
+                .catch((erro) => {
+                    console.error(`Erro ${erro}`);
+                    setModalAtivo(true);
+                    setMensagemModal("Erro ao enviar formulário!");
+                });
         },
     });
     return (
@@ -58,7 +72,7 @@ const Formulario = (props: Props) => {
                 component="div"
                 sx={{ mt: 2 }}
             >
-                Cadastro de pacientes
+                {props.id ? "Editar Paciente" : "Cadastrar Paciente"}
             </Typography>
             <form onSubmit={formik.handleSubmit} method="POST">
                 <Grid container sx={{ mt: 0 }} spacing={6}>
@@ -266,7 +280,7 @@ const Formulario = (props: Props) => {
             </form>
             <ModalConfirmacao
                 ativo={modalAtivo}
-                mensagem={"Dados salvos com sucesso"}
+                mensagem={mensagemModal}
             ></ModalConfirmacao>
         </>
     );

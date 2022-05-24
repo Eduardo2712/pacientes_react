@@ -1,6 +1,6 @@
 import { DataGrid, GridColDef, GridRowsProp, ptBR } from "@mui/x-data-grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Box, Button, Grid } from "@mui/material";
+import { Box, Button, CircularProgress, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import ModalConfirmacao from "../../../components/modalConfirmacao";
 import { Link } from "react-router-dom";
@@ -11,6 +11,7 @@ import axios from "axios";
 
 const TabelaPacientes = () => {
     const tema = createTheme({}, ptBR);
+    const [carregando, setCarregando] = useState<boolean>(true);
     const [modalAtivo, setModalAtivo] = useState<boolean>(false);
     const [linhas, setLinhas] = useState<GridRowsProp>([]);
 
@@ -19,6 +20,7 @@ const TabelaPacientes = () => {
             .get(`${process.env.REACT_APP_URL_API}/pacientes`)
             .then((resposta) => {
                 setLinhas(resposta.data.Items);
+                setCarregando(false);
             })
             .catch((erro) => {
                 console.error(`Erro ${erro}`);
@@ -128,14 +130,26 @@ const TabelaPacientes = () => {
         <>
             <Grid sx={{ mt: 4 }}>
                 <ThemeProvider theme={tema}>
-                    <DataGrid
-                        style={{ height: 300 }}
-                        rows={linhas}
-                        columns={colunas}
-                        pageSize={5}
-                        rowsPerPageOptions={[5]}
-                        disableSelectionOnClick
-                    ></DataGrid>
+                    {!carregando ? (
+                        <DataGrid
+                            style={{ height: 300 }}
+                            rows={linhas}
+                            columns={colunas}
+                            pageSize={5}
+                            rowsPerPageOptions={[5]}
+                            disableSelectionOnClick
+                        ></DataGrid>
+                    ) : (
+                        <Box
+                            sx={{
+                                mt: 4,
+                                display: "flex",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <CircularProgress />
+                        </Box>
+                    )}
                 </ThemeProvider>
             </Grid>
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
