@@ -13,9 +13,25 @@ interface Props {
 }
 
 const Formulario = (props: Props) => {
+    const [carregando, setCarregando] = useState<boolean>(true);
     const [modalAtivo, setModalAtivo] = useState<boolean>(false);
     const [mensagemModal, setMensagemModal] = useState<string>("");
     const [paciente, setPaciente] = useState<Items>();
+
+    useEffect(() => {
+        if (props.id) {
+            axios
+                .get(`${process.env.REACT_APP_URL_API}/pacientes/${props.id}`)
+                .then((resposta) => {
+                    setPaciente(resposta.data.Item);
+                    setCarregando(false);
+                })
+                .catch((erro) => {
+                    console.error(`Erro ${erro}`);
+                    setCarregando(false);
+                });
+        }
+    }, []);
 
     const esquema = Yup.object().shape({
         nome: Yup.string().required("Preencha esse campo!"),
@@ -37,7 +53,7 @@ const Formulario = (props: Props) => {
             numero: paciente?.numero ? paciente.numero : "",
             bairro: paciente?.bairro ? paciente.bairro : "",
             cidade: paciente?.cidade ? paciente.cidade : "",
-            id: props.id ? props.id : 0,
+            id: props.id ? props.id.toString() : "10",
         },
         validationSchema: esquema,
         onSubmit: (values, { resetForm }) => {
@@ -48,8 +64,8 @@ const Formulario = (props: Props) => {
             values.numero = values.numero;
             values.bairro = values.bairro.toUpperCase();
             values.cidade = values.cidade.toUpperCase();
-            values.id = props.id ? props.id : 0;
-
+            values.id = props.id ? props.id.toString() : "10";
+            console.log(values);
             axios
                 .put(`${process.env.REACT_APP_URL_API}/pacientes`, values)
                 .then((resposta) => {

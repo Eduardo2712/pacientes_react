@@ -24,6 +24,7 @@ const TabelaPacientes = () => {
             })
             .catch((erro) => {
                 console.error(`Erro ${erro}`);
+                setCarregando(false);
             });
     }, []);
 
