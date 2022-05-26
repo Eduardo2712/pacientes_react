@@ -13,6 +13,7 @@ const TabelaPacientes = () => {
     const tema = createTheme({}, ptBR);
     const [carregando, setCarregando] = useState<boolean>(true);
     const [modalAtivo, setModalAtivo] = useState<boolean>(false);
+    const [mensagemModal, setMensagemModal] = useState<string>("");
     const [linhas, setLinhas] = useState<GridRowsProp>([]);
 
     useEffect(() => {
@@ -27,6 +28,18 @@ const TabelaPacientes = () => {
                 setCarregando(false);
             });
     }, []);
+
+    const excluirPaciente = (id: string) => {
+        axios
+            .delete(`${process.env.REACT_APP_URL_API}/pacientes/${id}`)
+            .then((resposta) => {
+                setMensagemModal(`Paciente excluído com sucesso!`);
+                setModalAtivo(true);
+            })
+            .catch((erro) => {
+                console.error(`Erro ${erro}`);
+            });
+    };
 
     const colunas: GridColDef[] = [
         {
@@ -50,7 +63,12 @@ const TabelaPacientes = () => {
                                 style={{
                                     backgroundColor: "red",
                                 }}
-                                onClick={(e) => setModalAtivo(true)}
+                                onClick={() => {
+                                    setMensagemModal(
+                                        `Deseja excluir o ${linha?.row[1]}?`
+                                    );
+                                    setModalAtivo(true);
+                                }}
                             >
                                 <DeleteIcon></DeleteIcon>
                             </Button>
@@ -133,7 +151,7 @@ const TabelaPacientes = () => {
                 <ThemeProvider theme={tema}>
                     {!carregando ? (
                         <DataGrid
-                            style={{ height: 300 }}
+                            style={{ height: 400 }}
                             rows={linhas}
                             columns={colunas}
                             pageSize={5}
@@ -163,7 +181,7 @@ const TabelaPacientes = () => {
             </Box>
             <ModalConfirmacao
                 ativo={modalAtivo}
-                mensagem={"Deseja realmente excluir esse paciente?"}
+                mensagem={mensagemModal}
             ></ModalConfirmacao>
         </>
     );

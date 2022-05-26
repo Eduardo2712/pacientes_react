@@ -53,7 +53,7 @@ const Formulario = (props: Props) => {
             numero: paciente?.numero ? paciente.numero : "",
             bairro: paciente?.bairro ? paciente.bairro : "",
             cidade: paciente?.cidade ? paciente.cidade : "",
-            id: props.id ? props.id.toString() : "10",
+            id: props.id ? props.id.toString() : "",
         },
         validationSchema: esquema,
         onSubmit: (values, { resetForm }) => {
@@ -64,8 +64,10 @@ const Formulario = (props: Props) => {
             values.numero = values.numero;
             values.bairro = values.bairro.toUpperCase();
             values.cidade = values.cidade.toUpperCase();
-            values.id = props.id ? props.id.toString() : "10";
-            console.log(values);
+            values.id = props.id
+                ? props.id.toString()
+                : `PACIENTE#${values.nome.replace(" ", "")}`;
+
             axios
                 .put(`${process.env.REACT_APP_URL_API}/pacientes`, values)
                 .then((resposta) => {

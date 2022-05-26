@@ -19,7 +19,7 @@ const ModalConfirmacao = (props: Props) => {
 
     useEffect(() => {
         setOpen(props.ativo);
-    }, [props.ativo]);
+    }, [props]);
 
     const handleClose = () => {
         setOpen(false);
