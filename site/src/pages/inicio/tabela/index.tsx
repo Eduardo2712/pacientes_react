@@ -8,13 +8,14 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import reduxModal from "../../../store/modal/modal.actions";
 
 const TabelaPacientes = () => {
     const tema = createTheme({}, ptBR);
     const [carregando, setCarregando] = useState<boolean>(true);
-    const [modalAtivo, setModalAtivo] = useState<boolean>(false);
-    const [mensagemModal, setMensagemModal] = useState<string>("");
     const [linhas, setLinhas] = useState<GridRowsProp>([]);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         axios
@@ -22,6 +23,12 @@ const TabelaPacientes = () => {
             .then((resposta) => {
                 setLinhas(resposta.data.Items);
                 setCarregando(false);
+                dispatch(
+                    reduxModal({
+                        ativo: false,
+                        titulo: "",
+                    })
+                );
             })
             .catch((erro) => {
                 console.error(`Erro ${erro}`);
@@ -33,8 +40,12 @@ const TabelaPacientes = () => {
         axios
             .delete(`${process.env.REACT_APP_URL_API}/pacientes/${id}`)
             .then((resposta) => {
-                setMensagemModal(`Paciente excluído com sucesso!`);
-                setModalAtivo(true);
+                dispatch(
+                    reduxModal({
+                        ativo: true,
+                        titulo: "Paciente excluído com sucesso!",
+                    })
+                );
             })
             .catch((erro) => {
                 console.error(`Erro ${erro}`);
@@ -64,10 +75,10 @@ const TabelaPacientes = () => {
                                     backgroundColor: "red",
                                 }}
                                 onClick={() => {
-                                    setMensagemModal(
-                                        `Deseja excluir o ${linha?.row[1]}?`
-                                    );
-                                    setModalAtivo(true);
+                                    // setMensagemModal(
+                                    //     `Deseja excluir o ${linha?.row[1]}?`
+                                    // );
+                                    // setModalAtivo(true);
                                 }}
                             >
                                 <DeleteIcon></DeleteIcon>
@@ -179,10 +190,6 @@ const TabelaPacientes = () => {
                     ></AddBoxIcon>
                 </Link>
             </Box>
-            <ModalConfirmacao
-                ativo={modalAtivo}
-                mensagem={mensagemModal}
-            ></ModalConfirmacao>
         </>
     );
 };

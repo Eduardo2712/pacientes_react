@@ -8,3 +8,8 @@ export interface Items {
     bairro: string;
     cidade: string;
 }
+
+export interface ReduxModal {
+    ativo: boolean;
+    titulo: string;
+}

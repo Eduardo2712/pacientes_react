@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import { Items } from "../../../interfaces";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 interface Props {
     id?: number;
@@ -14,8 +15,6 @@ interface Props {
 
 const Formulario = (props: Props) => {
     const [carregando, setCarregando] = useState<boolean>(true);
-    const [modalAtivo, setModalAtivo] = useState<boolean>(false);
-    const [mensagemModal, setMensagemModal] = useState<string>("");
     const [paciente, setPaciente] = useState<Items>();
 
     useEffect(() => {
@@ -71,14 +70,14 @@ const Formulario = (props: Props) => {
             axios
                 .put(`${process.env.REACT_APP_URL_API}/pacientes`, values)
                 .then((resposta) => {
-                    setMensagemModal("Paciente atualizado com sucesso!");
-                    setModalAtivo(true);
+                    // setMensagemModal("Paciente atualizado com sucesso!");
+                    // setModalAtivo(true);
                     resetForm();
                 })
                 .catch((erro) => {
                     console.error(`Erro ${erro}`);
-                    setModalAtivo(true);
-                    setMensagemModal("Erro ao enviar formulário!");
+                    // setModalAtivo(true);
+                    // setMensagemModal("Erro ao enviar formulário!");
                 });
         },
     });
@@ -296,10 +295,6 @@ const Formulario = (props: Props) => {
                     </Grid>
                 </Grid>
             </form>
-            <ModalConfirmacao
-                ativo={modalAtivo}
-                mensagem={mensagemModal}
-            ></ModalConfirmacao>
         </>
     );
 };
