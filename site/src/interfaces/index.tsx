@@ -12,4 +12,5 @@ export interface Items {
 export interface ReduxModal {
     ativo: boolean;
     titulo: string;
+    confirmacao?: boolean;
 }

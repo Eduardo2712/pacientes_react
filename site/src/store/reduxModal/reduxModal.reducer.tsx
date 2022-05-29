@@ -6,6 +6,7 @@ export default (
     state: ReduxModal = {
         ativo: false,
         titulo: "",
+        confirmacao: false,
     },
     action: any
 ) => {

@@ -6,7 +6,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import { useSelector, useDispatch } from "react-redux";
-import reduxModal from "../../store/reduxModal/reduxModal.actions";
+import { reduxModal } from "../../store/reduxModal/reduxModal.actions";
 
 const ModalAviso = () => {
     const theme = useTheme();
@@ -37,7 +37,7 @@ const ModalAviso = () => {
                 <DialogContent></DialogContent>
                 <DialogActions>
                     <Button onClick={fecharModal} autoFocus>
-                        Sim
+                        Fechar
                     </Button>
                 </DialogActions>
             </Dialog>

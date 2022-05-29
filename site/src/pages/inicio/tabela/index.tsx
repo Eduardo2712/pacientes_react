@@ -1,38 +1,23 @@
 import { DataGrid, GridColDef, GridRowsProp, ptBR } from "@mui/x-data-grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Box, Button, Container, Grid } from "@mui/material";
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import reduxModal from "../../../store/reduxModal/reduxModal.actions";
-import { ReduxModal } from "../../../interfaces";
+import { useDispatch } from "react-redux";
+import { reduxModal } from "../../../store/reduxModal/reduxModal.actions";
 import Carregando from "../../../components/carregando";
+import useSWR from "swr";
 
 const TabelaPacientes = () => {
     const tema = createTheme({}, ptBR);
-    const [carregando, setCarregando] = useState<boolean>(true);
-    const [linhas, setLinhas] = useState<GridRowsProp>([]);
-    const valoresModal = useSelector((state: ReduxModal) => {
-        return state;
-    });
     const dispatch = useDispatch();
-
-    useEffect(() => {
-        axios
-            .get(`${process.env.REACT_APP_URL_API}/pacientes`)
-            .then((resposta) => {
-                setLinhas(resposta.data.Items);
-                setCarregando(false);
-            })
-            .catch((erro) => {
-                console.error(`Erro ${erro}`);
-                setCarregando(false);
-            });
-    }, []);
+    const { data, error, mutate } = useSWR(
+        `${process.env.REACT_APP_URL_API}/pacientes`,
+        (url: string) => axios(url).then((resposta) => resposta.data)
+    );
 
     const excluirPaciente = (id: string) => {
         axios
@@ -44,6 +29,7 @@ const TabelaPacientes = () => {
                         titulo: "Paciente excluído com sucesso!",
                     })
                 );
+                mutate();
             })
             .catch((erro) => {
                 console.error(`Erro ${erro}`);
@@ -73,13 +59,9 @@ const TabelaPacientes = () => {
                                     backgroundColor: "red",
                                 }}
                                 onClick={() => {
-                                    dispatch(
-                                        reduxModal({
-                                            ativo: true,
-                                            titulo: "BATATA",
-                                        })
-                                    );
+                                    excluirPaciente(linha.id.toString());
                                 }}
+                                title="Excluir paciente"
                             >
                                 <DeleteIcon></DeleteIcon>
                             </Button>
@@ -97,6 +79,7 @@ const TabelaPacientes = () => {
                                     minWidth: "32px",
                                 }}
                                 to={`paciente/${linha.id}`}
+                                title="Editar paciente"
                             >
                                 <EditIcon></EditIcon>
                             </Link>
@@ -156,24 +139,24 @@ const TabelaPacientes = () => {
         },
     ];
 
+    if (!data) {
+        return <Carregando></Carregando>;
+    }
+
     return (
         <>
             <Container maxWidth="xl">
                 <Grid sx={{ mt: 4 }}>
                     <ThemeProvider theme={tema}>
-                        {!carregando ? (
-                            <DataGrid
-                                getRowId={(colunas) => colunas.email}
-                                style={{ height: 400 }}
-                                rows={linhas}
-                                columns={colunas}
-                                pageSize={5}
-                                rowsPerPageOptions={[5]}
-                                disableSelectionOnClick
-                            ></DataGrid>
-                        ) : (
-                            <Carregando></Carregando>
-                        )}
+                        <DataGrid
+                            getRowId={(colunas) => colunas.email}
+                            style={{ height: 400 }}
+                            rows={data.Items}
+                            columns={colunas}
+                            pageSize={5}
+                            rowsPerPageOptions={[5]}
+                            disableSelectionOnClick
+                        ></DataGrid>
                     </ThemeProvider>
                 </Grid>
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

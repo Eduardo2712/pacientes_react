@@ -1,6 +1,5 @@
-import { Container } from "@mui/material";
 import Cabecalho from "../../components/cabecalho";
-import ModalConfirmacao from "../../components/modalAviso";
+import ModalAviso from "../../components/modalAviso";
 import TabelaPacientes from "./tabela";
 
 const Inicio = () => {
@@ -8,7 +7,7 @@ const Inicio = () => {
         <>
             <Cabecalho></Cabecalho>
             <TabelaPacientes></TabelaPacientes>
-            <ModalConfirmacao></ModalConfirmacao>
+            <ModalAviso></ModalAviso>
         </>
     );
 };
