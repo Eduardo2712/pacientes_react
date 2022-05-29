@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
-import modalReducer from "./modal/modal.reducer";
+import reduxModal from "./reduxModal/reduxModal.reducer";
 
 const rootReducer = combineReducers({
-    modal: modalReducer,
+    reduxModal: reduxModal,
 });
 
 export default configureStore({

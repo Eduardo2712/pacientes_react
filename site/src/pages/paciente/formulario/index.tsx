@@ -1,43 +1,59 @@
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Button, Grid, TextField, Typography } from "@mui/material";
-import ModalConfirmacao from "../../../components/modalConfirmacao";
-import { Link } from "react-router-dom";
+import { Button, Container, Grid, TextField, Typography } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import { Items } from "../../../interfaces";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import reduxModal from "../../../store/reduxModal/reduxModal.actions";
+import Carregando from "../../../components/carregando";
 
 interface Props {
-    id?: number;
+    email?: string;
 }
 
 const Formulario = (props: Props) => {
     const [carregando, setCarregando] = useState<boolean>(true);
     const [paciente, setPaciente] = useState<Items>();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     useEffect(() => {
-        if (props.id) {
+        console.log(props.email);
+        if (props.email) {
             axios
-                .get(`${process.env.REACT_APP_URL_API}/pacientes/${props.id}`)
+                .get(
+                    `${process.env.REACT_APP_URL_API}/pacientes/${props.email}`
+                )
                 .then((resposta) => {
-                    setPaciente(resposta.data.Item);
-                    setCarregando(false);
+                    if (typeof resposta.data.Item !== "undefined") {
+                        setPaciente(resposta.data.Item);
+                        setCarregando(false);
+                    } else {
+                        navigate("/*");
+                    }
                 })
                 .catch((erro) => {
                     console.error(`Erro ${erro}`);
                     setCarregando(false);
                 });
+        } else {
+            setCarregando(false);
         }
     }, []);
 
     const esquema = Yup.object().shape({
         nome: Yup.string().required("Preencha esse campo!"),
-        email: Yup.string().required("Preencha esse campo!"),
+        email: Yup.string()
+            .email("Digite um e-mail válido")
+            .required("Preencha esse campo!"),
         data_nasc: Yup.string().required("Preencha esse campo!"),
         endereco: Yup.string().required("Preencha esse campo!"),
-        numero: Yup.string().required("Preencha esse campo!"),
+        numero: Yup.number()
+            .positive("Digite um número positivo")
+            .required("Preencha esse campo!"),
         bairro: Yup.string().required("Preencha esse campo!"),
         cidade: Yup.string().required("Preencha esse campo!"),
     });
@@ -52,7 +68,6 @@ const Formulario = (props: Props) => {
             numero: paciente?.numero ? paciente.numero : "",
             bairro: paciente?.bairro ? paciente.bairro : "",
             cidade: paciente?.cidade ? paciente.cidade : "",
-            id: props.id ? props.id.toString() : "",
         },
         validationSchema: esquema,
         onSubmit: (values, { resetForm }) => {
@@ -63,22 +78,29 @@ const Formulario = (props: Props) => {
             values.numero = values.numero;
             values.bairro = values.bairro.toUpperCase();
             values.cidade = values.cidade.toUpperCase();
-            values.id = props.id
-                ? props.id.toString()
-                : `PACIENTE#${values.nome.replace(" ", "")}`;
 
             axios
                 .put(`${process.env.REACT_APP_URL_API}/pacientes`, values)
                 .then((resposta) => {
-                    // setMensagemModal("Paciente atualizado com sucesso!");
-                    // setModalAtivo(true);
-                    resetForm();
+                    dispatch(
+                        reduxModal({
+                            ativo: true,
+                            titulo: props.email
+                                ? "Atualizado com sucesso!"
+                                : "Cadastrado com sucesso!",
+                        })
+                    );
                 })
                 .catch((erro) => {
+                    dispatch(
+                        reduxModal({
+                            ativo: true,
+                            titulo: "Erro ao cadastrar paciente!",
+                        })
+                    );
                     console.error(`Erro ${erro}`);
-                    // setModalAtivo(true);
-                    // setMensagemModal("Erro ao enviar formulário!");
                 });
+            resetForm();
         },
     });
     return (
@@ -89,212 +111,223 @@ const Formulario = (props: Props) => {
                 component="div"
                 sx={{ mt: 2 }}
             >
-                {props.id ? "Editar Paciente" : "Cadastrar Paciente"}
+                {props.email ? "Editar Paciente" : "Cadastrar Paciente"}
             </Typography>
-            <form onSubmit={formik.handleSubmit} method="POST">
-                <Grid container sx={{ mt: 0 }} spacing={6}>
-                    <Grid item xs={6} className="bloco-campo">
-                        <TextField
-                            fullWidth
-                            id="nome"
-                            name="nome"
-                            className="campo"
-                            type="text"
-                            label="NOME*"
-                            InputLabelProps={{ shrink: true }}
-                            inputProps={{
-                                maxLength: 100,
-                                style: { textTransform: "uppercase" },
+            <Container maxWidth="xl">
+                {!carregando ? (
+                    <form onSubmit={formik.handleSubmit} method="POST">
+                        <Grid
+                            container
+                            sx={{
+                                mt: 0,
+                                justifyContent: "center",
                             }}
-                            value={formik.values.nome}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.nome &&
-                                Boolean(formik.errors.nome)
-                            }
-                            helperText={
-                                formik.touched.nome && formik.errors.nome
-                            }
-                        />
-                    </Grid>
-                    <Grid item xs={6} className="bloco-campo">
-                        <TextField
-                            fullWidth
-                            id="email"
-                            name="email"
-                            className="campo"
-                            type="text"
-                            label="E-MAIL*"
-                            InputLabelProps={{ shrink: true }}
-                            inputProps={{
-                                maxLength: 100,
-                                style: { textTransform: "uppercase" },
-                            }}
-                            value={formik.values.email}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.email &&
-                                Boolean(formik.errors.email)
-                            }
-                            helperText={
-                                formik.touched.email && formik.errors.email
-                            }
-                        />
-                    </Grid>
-                    <Grid item xs={6} className="bloco-campo">
-                        <TextField
-                            fullWidth
-                            id="data_nasc"
-                            name="data_nasc"
-                            className="campo"
-                            type="date"
-                            label="DATA NASCIMENTO*"
-                            InputLabelProps={{ shrink: true }}
-                            inputProps={{
-                                maxLength: 100,
-                                style: { textTransform: "uppercase" },
-                            }}
-                            value={formik.values.data_nasc}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.data_nasc &&
-                                Boolean(formik.errors.data_nasc)
-                            }
-                            helperText={
-                                formik.touched.data_nasc &&
-                                formik.errors.data_nasc
-                            }
-                        />
-                    </Grid>
-                    <Grid item xs={6} className="bloco-campo">
-                        <TextField
-                            fullWidth
-                            id="endereco"
-                            name="endereco"
-                            className="campo"
-                            type="text"
-                            label="ENDEREÇO*"
-                            InputLabelProps={{ shrink: true }}
-                            inputProps={{
-                                maxLength: 100,
-                                style: { textTransform: "uppercase" },
-                            }}
-                            value={formik.values.endereco}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.endereco &&
-                                Boolean(formik.errors.endereco)
-                            }
-                            helperText={
-                                formik.touched.endereco &&
-                                formik.errors.endereco
-                            }
-                        />
-                    </Grid>
-                    <Grid item xs={6} className="bloco-campo">
-                        <TextField
-                            fullWidth
-                            id="numero"
-                            name="numero"
-                            className="campo"
-                            type="number"
-                            label="NÚMERO*"
-                            InputLabelProps={{ shrink: true }}
-                            inputProps={{
-                                maxLength: 100,
-                                style: { textTransform: "uppercase" },
-                            }}
-                            value={formik.values.numero}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.numero &&
-                                Boolean(formik.errors.numero)
-                            }
-                            helperText={
-                                formik.touched.numero && formik.errors.numero
-                            }
-                        />
-                    </Grid>
-                    <Grid item xs={6} className="bloco-campo">
-                        <TextField
-                            fullWidth
-                            id="bairro"
-                            name="bairro"
-                            className="campo"
-                            type="text"
-                            label="BAIRRO*"
-                            InputLabelProps={{ shrink: true }}
-                            inputProps={{
-                                maxLength: 100,
-                                style: { textTransform: "uppercase" },
-                            }}
-                            value={formik.values.bairro}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.bairro &&
-                                Boolean(formik.errors.bairro)
-                            }
-                            helperText={
-                                formik.touched.bairro && formik.errors.bairro
-                            }
-                        />
-                    </Grid>
-                    <Grid item xs={6} className="bloco-campo">
-                        <TextField
-                            fullWidth
-                            id="cidade"
-                            name="cidade"
-                            className="campo"
-                            type="text"
-                            label="CIDADE*"
-                            InputLabelProps={{ shrink: true }}
-                            inputProps={{
-                                maxLength: 100,
-                                style: { textTransform: "uppercase" },
-                            }}
-                            value={formik.values.cidade}
-                            onChange={formik.handleChange}
-                            error={
-                                formik.touched.cidade &&
-                                Boolean(formik.errors.cidade)
-                            }
-                            helperText={
-                                formik.touched.cidade && formik.errors.cidade
-                            }
-                        />
-                    </Grid>
-                </Grid>
-                <Grid container spacing={2} mt={3}>
-                    <Grid
-                        container
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                    >
-                        <Grid ml={6}>
-                            <Link to={"/"}>
-                                <KeyboardReturnIcon
-                                    sx={{ width: 150, height: 40 }}
-                                    style={{
-                                        backgroundColor: "#1565c0",
-                                        color: "#fff",
-                                        borderRadius: "4px",
+                            spacing={6}
+                        >
+                            <Grid item sm={6}>
+                                <TextField
+                                    sx={{ minWidth: "270px" }}
+                                    fullWidth
+                                    id="nome"
+                                    name="nome"
+                                    type="text"
+                                    label="NOME*"
+                                    InputLabelProps={{ shrink: true }}
+                                    inputProps={{
+                                        style: { textTransform: "uppercase" },
                                     }}
-                                ></KeyboardReturnIcon>
-                            </Link>
+                                    value={formik.values.nome}
+                                    onChange={formik.handleChange}
+                                    error={
+                                        formik.touched.nome &&
+                                        Boolean(formik.errors.nome)
+                                    }
+                                    helperText={
+                                        formik.touched.nome &&
+                                        formik.errors.nome
+                                    }
+                                />
+                            </Grid>
+                            <Grid item sm={6}>
+                                <TextField
+                                    sx={{ minWidth: "270px" }}
+                                    fullWidth
+                                    id="email"
+                                    name="email"
+                                    type="text"
+                                    label="E-MAIL*"
+                                    InputLabelProps={{ shrink: true }}
+                                    inputProps={{
+                                        style: { textTransform: "uppercase" },
+                                    }}
+                                    value={formik.values.email}
+                                    onChange={formik.handleChange}
+                                    error={
+                                        formik.touched.email &&
+                                        Boolean(formik.errors.email)
+                                    }
+                                    helperText={
+                                        formik.touched.email &&
+                                        formik.errors.email
+                                    }
+                                    disabled={props.email ? true : false}
+                                />
+                            </Grid>
+                            <Grid item sm={6}>
+                                <TextField
+                                    sx={{ minWidth: "270px" }}
+                                    fullWidth
+                                    id="data_nasc"
+                                    name="data_nasc"
+                                    type="date"
+                                    label="DATA DE NASCIMENTO*"
+                                    InputLabelProps={{ shrink: true }}
+                                    inputProps={{
+                                        style: { textTransform: "uppercase" },
+                                    }}
+                                    value={formik.values.data_nasc}
+                                    onChange={formik.handleChange}
+                                    error={
+                                        formik.touched.data_nasc &&
+                                        Boolean(formik.errors.data_nasc)
+                                    }
+                                    helperText={
+                                        formik.touched.data_nasc &&
+                                        formik.errors.data_nasc
+                                    }
+                                />
+                            </Grid>
+                            <Grid item sm={6}>
+                                <TextField
+                                    sx={{ minWidth: "270px" }}
+                                    fullWidth
+                                    id="endereco"
+                                    name="endereco"
+                                    type="text"
+                                    label="ENDEREÇO*"
+                                    InputLabelProps={{ shrink: true }}
+                                    inputProps={{
+                                        style: { textTransform: "uppercase" },
+                                    }}
+                                    value={formik.values.endereco}
+                                    onChange={formik.handleChange}
+                                    error={
+                                        formik.touched.endereco &&
+                                        Boolean(formik.errors.endereco)
+                                    }
+                                    helperText={
+                                        formik.touched.endereco &&
+                                        formik.errors.endereco
+                                    }
+                                />
+                            </Grid>
+                            <Grid item sm={6}>
+                                <TextField
+                                    sx={{ minWidth: "270px" }}
+                                    fullWidth
+                                    id="numero"
+                                    name="numero"
+                                    type="number"
+                                    label="NÚMERO*"
+                                    InputLabelProps={{ shrink: true }}
+                                    inputProps={{
+                                        style: { textTransform: "uppercase" },
+                                    }}
+                                    value={formik.values.numero}
+                                    onChange={formik.handleChange}
+                                    error={
+                                        formik.touched.numero &&
+                                        Boolean(formik.errors.numero)
+                                    }
+                                    helperText={
+                                        formik.touched.numero &&
+                                        formik.errors.numero
+                                    }
+                                />
+                            </Grid>
+                            <Grid item sm={6}>
+                                <TextField
+                                    sx={{ minWidth: "270px" }}
+                                    fullWidth
+                                    id="bairro"
+                                    name="bairro"
+                                    type="text"
+                                    label="BAIRRO*"
+                                    InputLabelProps={{ shrink: true }}
+                                    inputProps={{
+                                        style: { textTransform: "uppercase" },
+                                    }}
+                                    value={formik.values.bairro}
+                                    onChange={formik.handleChange}
+                                    error={
+                                        formik.touched.bairro &&
+                                        Boolean(formik.errors.bairro)
+                                    }
+                                    helperText={
+                                        formik.touched.bairro &&
+                                        formik.errors.bairro
+                                    }
+                                />
+                            </Grid>
+                            <Grid item sm={6}>
+                                <TextField
+                                    sx={{ minWidth: "270px" }}
+                                    fullWidth
+                                    id="cidade"
+                                    name="cidade"
+                                    type="text"
+                                    label="CIDADE*"
+                                    InputLabelProps={{ shrink: true }}
+                                    inputProps={{
+                                        style: { textTransform: "uppercase" },
+                                    }}
+                                    value={formik.values.cidade}
+                                    onChange={formik.handleChange}
+                                    error={
+                                        formik.touched.cidade &&
+                                        Boolean(formik.errors.cidade)
+                                    }
+                                    helperText={
+                                        formik.touched.cidade &&
+                                        formik.errors.cidade
+                                    }
+                                />
+                            </Grid>
                         </Grid>
-                        <Grid mr={6}>
-                            <Button
-                                sx={{ width: 150, height: 40 }}
-                                type="submit"
-                                variant="contained"
-                            >
-                                Enviar
-                            </Button>
+                        <Grid
+                            mt={3}
+                            container
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center"
+                        >
+                            <Grid>
+                                <Link to={"/"}>
+                                    <KeyboardReturnIcon
+                                        sx={{ width: 150, height: 40 }}
+                                        style={{
+                                            backgroundColor: "#1565c0",
+                                            color: "#fff",
+                                            borderRadius: "4px",
+                                        }}
+                                    ></KeyboardReturnIcon>
+                                </Link>
+                            </Grid>
+                            <Grid>
+                                <Button
+                                    sx={{ width: 150, height: 40 }}
+                                    type="submit"
+                                    variant="contained"
+                                >
+                                    Enviar
+                                </Button>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Grid>
-            </form>
+                    </form>
+                ) : (
+                    <Carregando></Carregando>
+                )}
+            </Container>
         </>
     );
 };

@@ -5,40 +5,38 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
-import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import reduxModal from "../../store/reduxModal/reduxModal.actions";
 
-interface Props {
-    ativo: boolean;
-    mensagem: string;
-}
-
-const ModalConfirmacao = (props: Props) => {
-    const [open, setOpen] = useState<boolean>(false);
+const ModalAviso = () => {
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+    const valoresModal = useSelector((state: any) => state.reduxModal);
+    const dispatch = useDispatch();
 
-    useEffect(() => {
-        setOpen(props.ativo);
-    }, [props]);
-
-    const handleClose = () => {
-        setOpen(false);
+    const fecharModal = () => {
+        dispatch(
+            reduxModal({
+                ...valoresModal,
+                ativo: false,
+            })
+        );
     };
 
     return (
         <div>
             <Dialog
                 fullScreen={fullScreen}
-                open={open}
-                onClose={handleClose}
+                open={valoresModal.ativo}
+                onClose={fecharModal}
                 aria-labelledby="responsive-dialog-title"
             >
                 <DialogTitle id="responsive-dialog-title">
-                    {props.mensagem}
+                    {valoresModal.titulo}
                 </DialogTitle>
                 <DialogContent></DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} autoFocus>
+                    <Button onClick={fecharModal} autoFocus>
                         Sim
                     </Button>
                 </DialogActions>
@@ -47,4 +45,4 @@ const ModalConfirmacao = (props: Props) => {
     );
 };
 
-export default ModalConfirmacao;
+export default ModalAviso;

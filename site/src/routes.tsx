@@ -9,7 +9,7 @@ const Rotas = () => {
             <Routes>
                 <Route path={"/"} element={<Inicio />} />
                 <Route path={"/paciente/"} element={<Paciente />} />
-                <Route path={"/paciente/:id"} element={<Paciente />} />
+                <Route path={"/paciente/:email"} element={<Paciente />} />
                 <Route path="*" element={<Pagina404 />} />
             </Routes>
         </BrowserRouter>

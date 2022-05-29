@@ -1,20 +1,24 @@
 import { DataGrid, GridColDef, GridRowsProp, ptBR } from "@mui/x-data-grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Box, Button, CircularProgress, Grid } from "@mui/material";
+import { Box, Button, Container, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
-import ModalConfirmacao from "../../../components/modalConfirmacao";
 import { Link } from "react-router-dom";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
-import { useDispatch } from "react-redux";
-import reduxModal from "../../../store/modal/modal.actions";
+import { useDispatch, useSelector } from "react-redux";
+import reduxModal from "../../../store/reduxModal/reduxModal.actions";
+import { ReduxModal } from "../../../interfaces";
+import Carregando from "../../../components/carregando";
 
 const TabelaPacientes = () => {
     const tema = createTheme({}, ptBR);
     const [carregando, setCarregando] = useState<boolean>(true);
     const [linhas, setLinhas] = useState<GridRowsProp>([]);
+    const valoresModal = useSelector((state: ReduxModal) => {
+        return state;
+    });
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -23,12 +27,6 @@ const TabelaPacientes = () => {
             .then((resposta) => {
                 setLinhas(resposta.data.Items);
                 setCarregando(false);
-                dispatch(
-                    reduxModal({
-                        ativo: false,
-                        titulo: "",
-                    })
-                );
             })
             .catch((erro) => {
                 console.error(`Erro ${erro}`);
@@ -75,10 +73,12 @@ const TabelaPacientes = () => {
                                     backgroundColor: "red",
                                 }}
                                 onClick={() => {
-                                    // setMensagemModal(
-                                    //     `Deseja excluir o ${linha?.row[1]}?`
-                                    // );
-                                    // setModalAtivo(true);
+                                    dispatch(
+                                        reduxModal({
+                                            ativo: true,
+                                            titulo: "BATATA",
+                                        })
+                                    );
                                 }}
                             >
                                 <DeleteIcon></DeleteIcon>
@@ -158,38 +158,33 @@ const TabelaPacientes = () => {
 
     return (
         <>
-            <Grid sx={{ mt: 4 }}>
-                <ThemeProvider theme={tema}>
-                    {!carregando ? (
-                        <DataGrid
-                            style={{ height: 400 }}
-                            rows={linhas}
-                            columns={colunas}
-                            pageSize={5}
-                            rowsPerPageOptions={[5]}
-                            disableSelectionOnClick
-                        ></DataGrid>
-                    ) : (
-                        <Box
-                            sx={{
-                                mt: 4,
-                                display: "flex",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <CircularProgress />
-                        </Box>
-                    )}
-                </ThemeProvider>
-            </Grid>
-            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <Link to={"/paciente"}>
-                    <AddBoxIcon
-                        style={{ color: "green", fontSize: "3.5rem" }}
-                        titleAccess={"Adicionar paciente"}
-                    ></AddBoxIcon>
-                </Link>
-            </Box>
+            <Container maxWidth="xl">
+                <Grid sx={{ mt: 4 }}>
+                    <ThemeProvider theme={tema}>
+                        {!carregando ? (
+                            <DataGrid
+                                getRowId={(colunas) => colunas.email}
+                                style={{ height: 400 }}
+                                rows={linhas}
+                                columns={colunas}
+                                pageSize={5}
+                                rowsPerPageOptions={[5]}
+                                disableSelectionOnClick
+                            ></DataGrid>
+                        ) : (
+                            <Carregando></Carregando>
+                        )}
+                    </ThemeProvider>
+                </Grid>
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                    <Link to={"/paciente"}>
+                        <AddBoxIcon
+                            style={{ color: "green", fontSize: "3.5rem" }}
+                            titleAccess={"Adicionar paciente"}
+                        ></AddBoxIcon>
+                    </Link>
+                </Box>
+            </Container>
         </>
     );
 };

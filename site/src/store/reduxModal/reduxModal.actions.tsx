@@ -2,11 +2,11 @@ import { ReduxModal } from "../../interfaces";
 
 const MODAL = "MODAL";
 
-const modal = (props: ReduxModal) => {
+const reduxModal = (props: ReduxModal) => {
     return {
         type: MODAL,
         payload: props,
     };
 };
 
-export default modal;
+export default reduxModal;
