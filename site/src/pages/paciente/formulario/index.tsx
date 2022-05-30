@@ -83,25 +83,26 @@ const Formulario = (props: Props) => {
             values.numero = values.numero;
             values.bairro = values.bairro.toUpperCase();
             values.cidade = values.cidade.toUpperCase();
-
+            setCarregando(true);
             axios
                 .put(`${process.env.REACT_APP_URL_API}/pacientes`, values)
                 .then((resposta) => {
+                    setCarregando(false);
                     dispatch(
                         reduxModal({
                             ativo: true,
                             titulo: props.email
-                                ? "Atualizado com sucesso!"
-                                : "Cadastrado com sucesso!",
+                                ? "Paciente Atualizado com sucesso!"
+                                : "Paciente cadastrado com sucesso!",
                         })
                     );
-                    resetForm();
+                    navigate("/");
                 })
                 .catch((erro) => {
                     dispatch(
                         reduxModal({
                             ativo: true,
-                            titulo: "Erro ao cadastrar paciente!",
+                            titulo: "Erro na requisição!",
                         })
                     );
                     console.error(`Erro ${erro}`);

@@ -143,6 +143,10 @@ const TabelaPacientes = () => {
         return <Carregando></Carregando>;
     }
 
+    if (error) {
+        console.error(error);
+    }
+
     return (
         <>
             <Container maxWidth="xl">
