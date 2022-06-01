@@ -9,9 +9,9 @@ import { useDispatch } from "react-redux";
 import { reduxModal } from "../../../store/reduxModal/reduxModal.actions";
 import Carregando from "../../../components/carregando";
 
-interface Props {
+type Props = {
     email?: string;
-}
+};
 
 const Formulario = (props: Props) => {
     const [carregando, setCarregando] = useState<boolean>(true);
@@ -304,6 +304,7 @@ const Formulario = (props: Props) => {
                     </Grid>
                     <Grid
                         mt={3}
+                        mb={3}
                         container
                         direction="row"
                         justifyContent="space-between"

@@ -1,5 +1,5 @@
 import Cabecalho from "../../components/cabecalho";
-import ModalAviso from "../../components/modalAviso";
+import Modal from "../../components/modal";
 import TabelaPacientes from "./tabela";
 
 const Inicio = () => {
@@ -7,7 +7,7 @@ const Inicio = () => {
         <>
             <Cabecalho></Cabecalho>
             <TabelaPacientes></TabelaPacientes>
-            <ModalAviso></ModalAviso>
+            <Modal></Modal>
         </>
     );
 };

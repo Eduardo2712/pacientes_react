@@ -8,7 +8,7 @@ import { useTheme } from "@mui/material/styles";
 import { useSelector, useDispatch } from "react-redux";
 import { reduxModal } from "../../store/reduxModal/reduxModal.actions";
 
-const ModalAviso = () => {
+const Modal = () => {
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
     const valoresModal = useSelector((state: any) => state.reduxModal);
@@ -45,4 +45,4 @@ const ModalAviso = () => {
     );
 };
 
-export default ModalAviso;
+export default Modal;
