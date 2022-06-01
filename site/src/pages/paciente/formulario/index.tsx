@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Button, Container, Grid, TextField, Typography } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
-import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
-import { Items } from "../../../interfaces";
+import { useNavigate } from "react-router-dom";
+import { Items } from "../../../types";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { reduxModal } from "../../../store/reduxModal/reduxModal.actions";
@@ -43,12 +42,6 @@ const Formulario = (props: Props) => {
         }
     }, []);
 
-    const formatarData = (data: string) => {
-        return `${data.split("-")[2]}/${data.split("-")[1]}/${
-            data.split("-")[0]
-        }`;
-    };
-
     const esquema = Yup.object().shape({
         nome: Yup.string().required("Preencha esse campo!"),
         email: Yup.string()
@@ -68,7 +61,11 @@ const Formulario = (props: Props) => {
         initialValues: {
             nome: paciente?.nome ? paciente.nome : "",
             email: paciente?.email ? paciente.email : "",
-            data_nasc: paciente?.data_nasc ? paciente.data_nasc : "",
+            data_nasc: paciente?.data_nasc
+                ? `${paciente.data_nasc.split("/")[2]}-${
+                      paciente.data_nasc.split("/")[1]
+                  }-${paciente.data_nasc.split("/")[0]}`
+                : "",
             endereco: paciente?.endereco ? paciente.endereco : "",
             numero: paciente?.numero ? paciente.numero : "",
             bairro: paciente?.bairro ? paciente.bairro : "",
@@ -78,7 +75,9 @@ const Formulario = (props: Props) => {
         onSubmit: (values, { resetForm }) => {
             values.nome = values.nome.toUpperCase();
             values.email = values.email.toUpperCase();
-            values.data_nasc = formatarData(values.data_nasc.toUpperCase());
+            values.data_nasc = `${values.data_nasc.split("-")[2]}/${
+                values.data_nasc.split("-")[1]
+            }/${values.data_nasc.split("-")[0]}`;
             values.endereco = values.endereco.toUpperCase();
             values.numero = values.numero;
             values.bairro = values.bairro.toUpperCase();
@@ -123,7 +122,7 @@ const Formulario = (props: Props) => {
                 component="div"
                 sx={{ mt: 2 }}
             >
-                {props.email ? "Editar Paciente" : "Cadastrar Paciente"}
+                {props.email ? "Edição de Paciente" : "Cadastro de Paciente"}
             </Typography>
             <Container maxWidth="xl">
                 <form onSubmit={formik.handleSubmit} method="POST">
@@ -311,16 +310,14 @@ const Formulario = (props: Props) => {
                         alignItems="center"
                     >
                         <Grid>
-                            <Link to={"/"}>
-                                <KeyboardReturnIcon
-                                    sx={{ width: 150, height: 40 }}
-                                    style={{
-                                        backgroundColor: "#1565c0",
-                                        color: "#fff",
-                                        borderRadius: "4px",
-                                    }}
-                                ></KeyboardReturnIcon>
-                            </Link>
+                            <Button
+                                sx={{ width: 150, height: 40 }}
+                                type="button"
+                                onClick={() => navigate("/")}
+                                variant="contained"
+                            >
+                                Voltar
+                            </Button>
                         </Grid>
                         <Grid>
                             <Button

@@ -1,4 +1,4 @@
-import { DataGrid, GridColDef, GridRowsProp, ptBR } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, ptBR } from "@mui/x-data-grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Box, Button, Container, Grid } from "@mui/material";
 import { Link } from "react-router-dom";

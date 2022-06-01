@@ -1,4 +1,4 @@
-import { ReduxModal } from "../../interfaces";
+import { ReduxModal } from "../../types";
 
 const MODAL = "MODAL";
 

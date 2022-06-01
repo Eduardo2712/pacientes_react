@@ -1,4 +1,4 @@
-import { ReduxModal } from "../../interfaces";
+import { ReduxModal } from "../../types";
 
 const MODAL = "MODAL";
 
@@ -6,7 +6,6 @@ export default (
     state: ReduxModal = {
         ativo: false,
         titulo: "",
-        confirmacao: false,
     },
     action: any
 ) => {
