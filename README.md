@@ -2,7 +2,7 @@
 
 Passos para executar o projeto
 
--> cd ./aplicacao
+-> cd ./site
 
 -> npm install
 
