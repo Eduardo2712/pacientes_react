@@ -1,3 +1,8 @@
+export type ReduxModal = {
+    ativo: boolean;
+    titulo: string;
+};
+
 export type Items = {
     id: number;
     nome: string;
@@ -8,9 +13,4 @@ export type Items = {
     numero: string;
     bairro: string;
     cidade: string;
-};
-
-export type ReduxModal = {
-    ativo: boolean;
-    titulo: string;
 };
